@@ -21,19 +21,36 @@ export const getNearbyStores = asyncHandler(async (req, res) => {
     //     }
     // });
 
-    const stores = await nearByStores.find({}) // add filtering logic here
-    if (!stores || stores.length === 0) {
-        return res.status(404).json({ message: "No nearby stores found" });
-    }
+    const userCoords = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
 
-    const enriched = stores.map(store => ({
-        _id: store._id,
+    const nearbyStores = stores
+    .map(store => {
+      const storeCoords = {
+        latitude: store.coordinates.lat,
+        longitude: store.coordinates.lng
+      };
+
+      const distanceInMeters = geolib.getDistance(userCoords, storeCoords);
+      const distanceKm = (distanceInMeters / 1000).toFixed(1);
+
+      return {
+        id: store._id,
+        img: store.images?.[0] || "/fallback.png",
         name: store.name,
-        images: store.images,
         location: store.location,
-        distance: "1 Km",  // <-- Replace with calculated value using coordinates
-        rating: store.rating.toFixed(1)
-    }));
+        rating: store.rating?.toFixed(1) || "4.9",
+        distance: `${distanceKm} Km`,
+        distanceRaw: parseFloat(distanceKm)
+      };
+    })
+    .filter(store => store.distanceRaw <= 5) // Filter stores within 5 km
+    .sort((a, b) => a.distanceRaw - b.distanceRaw); // Closest first
 
-    res.status(200).json(new ApiResponse(200, enriched, "Nearby stores fetched successfully"));
+  if (nearbyStores.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiResponse(200, [], "No stores found nearby"));
+  }
+
+  res.status(200).json(new ApiResponse(200, nearbyStores));
 });
