@@ -1,14 +1,16 @@
 import express from "express";
-import { getProductById, getProductsByTag } from "../controllers/product.Controller.js";
+import {
+  getProductsByTag,
+  getProductById,
+} from "../controllers/productController.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-
 
 const router = express.Router();
 
-// /api/products/home/fashion/for-you
+// GET /api/products/:section/:tab/:tag
 router.get("/:section/:tab/:tag", asyncHandler(getProductsByTag));
 
-// /api/products/:id
+// GET /api/products/details/:id
 router.get("/details/:id", asyncHandler(getProductById));
 
 export default router;

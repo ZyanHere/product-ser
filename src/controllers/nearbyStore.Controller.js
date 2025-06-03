@@ -1,4 +1,5 @@
-import nearByStores from "../models/nearbyStores.schema.js";
+
+import { Store } from "../models/stores.schema.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -22,6 +23,8 @@ export const getNearbyStores = asyncHandler(async (req, res) => {
     // });
 
     const userCoords = { latitude: parseFloat(lat), longitude: parseFloat(lng) };
+
+    const stores = await Store.find();
 
     const nearbyStores = stores
     .map(store => {
