@@ -1,4 +1,4 @@
-import nearByStores from "../models/nearByStores.js";
+import nearByStores from "../models/nearbyStores.schema.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
