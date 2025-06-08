@@ -1,4 +1,5 @@
 import { Inventory } from './../models/inventory.schema.js';
+import { ApiError } from './../utils/ApiError';
 
 export const getProductId = async (productId, varientId = null) => {
     const query = { productId };
@@ -26,3 +27,27 @@ export const addOrUpdateInventory = async ({
   const updated = await Inventory.findOneAndUpdate(query, update, options);
   return updated;
 };
+
+
+export const increaseStock = async ({
+    productId,
+    variantId = null,
+    quantity,
+}) => {
+    if(quantity <= 0 ){
+        throw new ApiError(400, "Quantity must be greater than zero");
+    }
+
+    const inventory = await getProductId(productId, variantId);
+    if(!inventory) {
+        // If no record exists, create with given quantity
+        const newInv = new Inventory({
+            productId,
+            variantId,
+            quantity,
+        });
+        return await newInv.save();
+    }
+    inventory.quantity += quantity;
+    return await inventory.save();
+}
