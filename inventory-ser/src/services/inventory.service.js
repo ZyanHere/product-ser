@@ -51,3 +51,28 @@ export const increaseStock = async ({
     inventory.quantity += quantity;
     return await inventory.save();
 }
+
+export const decreaseStock = async ({
+  productId,
+  variantId = null,
+  quantity,
+}) => {
+  if (quantity <= 0) {
+    throw new ApiError(400, "Quantity to decrease must be greater than zero");
+  }
+
+  const inventory = await getByProductId(productId, variantId);
+  if (!inventory) {
+    throw new ApiError(404, "Inventory record not found");
+  }
+
+  if (inventory.quantity < quantity) {
+    throw new ApiError(
+      400,
+      `Insufficient stock: available ${inventory.quantity}, requested ${quantity}`
+    );
+  }
+
+  inventory.quantity -= quantity;
+  return await inventory.save();
+};
