@@ -1,7 +1,7 @@
 import { Inventory } from './../models/inventory.schema.js';
 import { ApiError } from './../utils/ApiError';
 
-export const getProductId = async (productId, varientId = null) => {
+export const getByProductId = async (productId, varientId = null) => {
     const query = { productId };
     if(varientId) {
         query.varientId = varientId;
